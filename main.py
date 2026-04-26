@@ -1,14 +1,12 @@
-from agent_orbit import AgentOrbit
+from pathlib import Path
 
-if __name__ == "__main__":
-    print("🚀 Agent Orbit is starting...\n")
-    
-    agent = AgentOrbit()
-    
-    print("Agent is ready! What would you like to build or accomplish today?\n")
-    goal = input("> ").strip()
-    
-    if goal:
-        agent.run(goal)
-    else:
-        print("No goal provided. Goodbye!")
+print("🚀 Simple Agent Orbit Test")
+
+# Direct file creation test
+try:
+    Path("hello.txt").write_text("Hello from Agent Orbit!\nThis was created successfully.", encoding="utf-8")
+    print("✅ File 'hello.txt' created successfully!")
+except Exception as e:
+    print(f"❌ Error: {e}")
+
+print("\nTest complete.")
