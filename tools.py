@@ -1,26 +1,36 @@
-# tools.py - Simple version (no LangChain @tool issues)
+from langchain.tools import tool
+from pathlib import Path
+import subprocess
+from git import Repo
 
-class AgentTools:
-    def __init__(self, cm):
-        self.cm = cm
+@tool
+def create_or_edit_file(filepath: str, content: str) -> str:
+    """Create or edit a file with the given content."""
+    try:
+        Path(filepath).parent.mkdir(parents=True, exist_ok=True)
+        Path(filepath).write_text(content, encoding="utf-8")
+        return f"✅ Saved file: {filepath}"
+    except Exception as e:
+        return f"❌ Error saving file: {str(e)}"
 
-    def create_or_edit_file(self, filepath: str, content: str):
-        """Create or edit a file."""
-        try:
-            from pathlib import Path
-            Path(filepath).parent.mkdir(parents=True, exist_ok=True)
-            Path(filepath).write_text(content, encoding="utf-8")
-            return f"✅ Created/Updated file: {filepath}"
-        except Exception as e:
-            return f"❌ Error: {str(e)}"
+@tool
+def run_command(command: str, cwd: str = ".") -> str:
+    """Run a shell command."""
+    try:
+        result = subprocess.run(command, shell=True, cwd=cwd, capture_output=True, text=True, timeout=30)
+        return f"Exit code: {result.returncode}\n{result.stdout}\n{result.stderr}"
+    except Exception as e:
+        return f"❌ Error: {str(e)}"
 
-    def run_command(self, command: str):
-        """Run shell command."""
-        try:
-            import subprocess
-            result = subprocess.run(command, shell=True, capture_output=True, text=True, timeout=30)
-            return f"Exit {result.returncode}\n{result.stdout}\n{result.stderr}"
-        except Exception as e:
-            return f"❌ Error: {str(e)}"
+@tool
+def git_commit(message: str) -> str:
+    """Commit all changes to git."""
+    try:
+        repo = Repo(".")
+        repo.index.add(["."])
+        repo.index.commit(message)
+        return f"✅ Committed: {message}"
+    except Exception as e:
+        return f"❌ Git error: {str(e)}"
 
-print("✅ Simple tools loaded (no LangChain decorators)")
+print("✅ Tools loaded successfully (standalone version)")
