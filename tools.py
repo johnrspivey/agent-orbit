@@ -1,38 +1,22 @@
-# tools.py - Clean standalone tools (no class decorator issues)
+# tools.py - Minimal version to bypass LangChain decorator issues
 
-from langchain.tools import tool
-from pathlib import Path
-import subprocess
-from git import Repo
-
-@tool
-def create_or_edit_file(filepath: str, content: str) -> str:
-    """Create or edit any file."""
+def create_or_edit_file(filepath: str, content: str):
+    """Create or edit a file."""
+    from pathlib import Path
     try:
         Path(filepath).parent.mkdir(parents=True, exist_ok=True)
         Path(filepath).write_text(content, encoding="utf-8")
-        return f"✅ Successfully saved: {filepath}"
+        return f"✅ Created/updated file: {filepath}"
     except Exception as e:
-        return f"❌ Error saving file: {str(e)}"
+        return f"❌ Failed to save file: {str(e)}"
 
-@tool
-def run_command(command: str, cwd: str = ".") -> str:
-    """Run a shell command."""
+def run_command(command: str):
+    """Run shell command."""
+    import subprocess
     try:
-        result = subprocess.run(command, shell=True, cwd=cwd, capture_output=True, text=True, timeout=30)
-        return f"Exit code: {result.returncode}\n{result.stdout}\n{result.stderr}"
+        result = subprocess.run(command, shell=True, capture_output=True, text=True, timeout=30)
+        return f"Exit code: {result.returncode}\n{result.stdout}"
     except Exception as e:
-        return f"❌ Command error: {str(e)}"
+        return f"❌ Command failed: {str(e)}"
 
-@tool
-def git_commit(message: str) -> str:
-    """Commit changes to git."""
-    try:
-        repo = Repo(".")
-        repo.index.add(["."])
-        repo.index.commit(message)
-        return f"✅ Committed: {message}"
-    except Exception as e:
-        return f"❌ Git error: {str(e)}"
-
-print("✅ Tools loaded successfully")
+print("✅ Minimal tools loaded successfully")
