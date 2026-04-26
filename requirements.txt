@@ -1,0 +1,8 @@
+langgraph
+langgraph-checkpoint-sqlite
+langchain-xai
+python-dotenv
+gradio
+py-trello
+gitpython
+openai
