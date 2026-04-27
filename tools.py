@@ -1,17 +1,11 @@
-# tools.py - Final clean version using StructuredTool
-from langchain.tools import StructuredTool
-from pydantic import BaseModel, Field
+from langchain.tools import tool
 from pathlib import Path
 import subprocess
 from git import Repo
-from typing import Optional
 
-class CreateFileInput(BaseModel):
-    filepath: str = Field(..., description="Path to the file")
-    content: str = Field(..., description="Content to write")
-
-def _create_or_edit_file(filepath: str, content: str) -> str:
-    """Create or edit a file."""
+@tool
+def create_or_edit_file(filepath: str, content: str) -> str:
+    """Create or edit any file."""
     try:
         Path(filepath).parent.mkdir(parents=True, exist_ok=True)
         Path(filepath).write_text(content, encoding="utf-8")
@@ -19,28 +13,18 @@ def _create_or_edit_file(filepath: str, content: str) -> str:
     except Exception as e:
         return f"❌ Error: {str(e)}"
 
-create_or_edit_file = StructuredTool.from_function(
-    func=_create_or_edit_file,
-    name="create_or_edit_file",
-    description="Create or edit a file with the given content",
-    args_schema=CreateFileInput
-)
-
-# Similarly for other tools
-def _run_command(command: str, cwd: str = ".") -> str:
+@tool
+def run_command(command: str, cwd: str = ".") -> str:
+    """Run a shell command."""
     try:
         result = subprocess.run(command, shell=True, cwd=cwd, capture_output=True, text=True, timeout=30)
-        return f"Exit {result.returncode}\n{result.stdout}"
+        return f"Exit code: {result.returncode}\n{result.stdout}"
     except Exception as e:
         return f"❌ Error: {str(e)}"
 
-run_command = StructuredTool.from_function(
-    func=_run_command,
-    name="run_command",
-    description="Run a shell command",
-)
-
-def _git_commit(message: str) -> str:
+@tool
+def git_commit(message: str) -> str:
+    """Commit changes to git."""
     try:
         repo = Repo(".")
         repo.index.add(["."])
@@ -49,10 +33,4 @@ def _git_commit(message: str) -> str:
     except Exception as e:
         return f"❌ Git error: {str(e)}"
 
-git_commit = StructuredTool.from_function(
-    func=_git_commit,
-    name="git_commit",
-    description="Commit changes to git",
-)
-
-print("✅ Tools loaded (StructuredTool version)")
+print("✅ Tools loaded (standalone functions)")
