@@ -8,6 +8,7 @@ from langgraph.checkpoint.sqlite import SqliteSaver
 from langchain_xai import ChatXAI
 
 from credential_manager import CredentialManager
+# Import standalone tools
 from tools import create_or_edit_file, run_command, git_commit
 
 class AgentOrbit:
@@ -16,7 +17,6 @@ class AgentOrbit:
         self.cm.setup("trello")
         self.cm.setup("xai")
 
-        # Tools
         self.tools = [create_or_edit_file, run_command, git_commit]
 
         # Persistent memory
