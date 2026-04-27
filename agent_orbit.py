@@ -1,4 +1,3 @@
-import os
 from datetime import datetime
 from typing import Optional
 
@@ -18,25 +17,20 @@ class AgentOrbit:
             api_key=self.cm.get("XAI_API_KEY")
         )
 
-        self.tools = {
-            "create_or_edit_file": create_or_edit_file,
-            "run_command": run_command,
-            "git_commit": git_commit,
-        }
+        print("✅ Agent Orbit initialized with direct tools")
 
     def run(self, goal: str, thread_id: Optional[str] = None):
         print(f"\n🚀 Agent Orbit Started")
         print(f"Goal: {goal}\n")
 
-        # Simple direct call for now
+        # Direct tool calling (bypassing LangGraph tool node)
         try:
-            # For file creation, call tool directly
-            if "hello.txt" in goal.lower():
-                result = create_or_edit_file.invoke({"filepath": "hello.txt", "content": "Hello from Agent Orbit!"})
+            if "hello.txt" in goal.lower() or "create a file" in goal.lower():
+                result = create_or_edit_file.invoke({"filepath": "hello.txt", "content": "Hello from Agent Orbit!\nThis works."})
                 print(f"🤖 {result}")
             else:
-                print("🤖 (Tool calling active - this goal not yet mapped)")
+                print("🤖 Goal received (more tools coming soon)")
         except Exception as e:
-            print(f"❌ Error: {str(e)}")
+            print(f"❌ Tool error: {str(e)}")
 
         print("✅ Session finished.\n")
