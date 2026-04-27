@@ -8,7 +8,6 @@ from langgraph.checkpoint.sqlite import SqliteSaver
 from langchain_xai import ChatXAI
 
 from credential_manager import CredentialManager
-# Import standalone tools
 from tools import create_or_edit_file, run_command, git_commit
 
 class AgentOrbit:
@@ -19,7 +18,6 @@ class AgentOrbit:
 
         self.tools = [create_or_edit_file, run_command, git_commit]
 
-        # Persistent memory
         conn = sqlite3.connect("agent_orbit_memory.db", check_same_thread=False)
         self.checkpointer = SqliteSaver(conn)
 
@@ -43,10 +41,13 @@ class AgentOrbit:
 
         inputs = {"messages": [("user", goal)]}
 
-        for chunk in self.agent.stream(inputs, config, stream_mode="values"):
-            if "messages" in chunk:
-                msg = chunk["messages"][-1]
-                if hasattr(msg, "content"):
-                    print(f"🤖 {msg.content}\n")
+        try:
+            for chunk in self.agent.stream(inputs, config, stream_mode="values"):
+                if "messages" in chunk:
+                    msg = chunk["messages"][-1]
+                    if hasattr(msg, "content"):
+                        print(f"🤖 {msg.content}\n")
+        except Exception as e:
+            print(f"❌ Agent error: {str(e)}")
 
-        print("✅ Session finished. Memory saved.\n")
+        print("✅ Session finished.\n")
